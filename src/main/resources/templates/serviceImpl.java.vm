@@ -1,0 +1,58 @@
+package ${package.ServiceImpl};
+
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+import ${superServiceImplClassPackage};
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+/**
+ * <p>
+ * $!{table.comment} 服务实现类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Service
+#if(${kotlin})
+open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperName}, ${entity}>(), ${table.serviceName} {
+
+}
+#else
+public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
+    @Autowired
+    private ${table.mapperName} ${table.entityPath}Mapper;
+
+    @Override
+    public Boolean saveOrUpdate${entity}(${entity} ${table.entityPath}){
+        if (${table.entityPath}.getId() == null){
+        return save(${table.entityPath});
+        } else {
+        return updateById(${table.entityPath});
+        }
+    }
+
+    @Override
+    public Boolean remove${entity}ById(Integer id){
+        return ${table.entityPath}Mapper.deleteById(id) > 0;
+    }
+
+    @Override
+    public IPage<${entity}> get${entity}ByPage(Integer currentPage, Integer pageSize, String ${table.entityPath}name){
+        IPage<${entity}> page = new Page<>(currentPage,pageSize);
+        if (${table.entityPath}name==""){
+            return ${table.entityPath}Mapper.selectPage(page,null);
+        }
+        QueryWrapper<${entity}> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("${table.entityPath}name",${table.entityPath}name);
+        queryWrapper.orderByDesc("id");
+        return ${table.entityPath}Mapper.selectPage(page,queryWrapper);
+    }
+}
+#end

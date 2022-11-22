@@ -1,0 +1,72 @@
+package ${package.Controller};
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
+import java.util.List;
+
+import $!{package.Service}.$!{table.serviceName};
+import ${package.Entity}.${entity};
+
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+
+/**
+ * <p>
+ * $!{table.comment} 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${restControllerStyle})
+@RestController
+#else
+@Controller
+#end
+@RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+#if(${kotlin})
+class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
+
+#else
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+    #end
+
+    @Autowired
+    private ${table.serviceName} ${table.entityPath}Service;
+
+    @PostMapping("/save")
+    public Boolean save${entity}(@RequestBody ${entity} ${table.entityPath}) {
+        return ${table.entityPath}Service.saveOrUpdate${entity}(${table.entityPath});
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public Boolean delete${entity}ById(@PathVariable Integer id) {
+        return ${table.entityPath}Service.remove${entity}ById(id);
+    }
+
+    @GetMapping
+    public List<${entity}> findAll${entity}() {
+        return ${table.entityPath}Service.list();
+    }
+
+    @GetMapping("/{id}")
+    public ${entity} findOne${entity}ById(@PathVariable("id") Integer id) {
+        return ${table.entityPath}Service.getById(id);
+    }
+
+    @GetMapping("/page")
+    public IPage<${entity}> find${entity}ByPage(@RequestParam("currentPage") Integer currentPage,
+                                               @RequestParam("pageSize") Integer pageSize,
+                                               @RequestParam(value = "${table.entityPath}name",defaultValue = "") String ${table.entityPath}name) {
+        return ${table.entityPath}Service.get${entity}ByPage(currentPage,pageSize,${table.entityPath}name);
+    }
+
+}
+
+#end
